@@ -56,6 +56,7 @@ LIMIT 25;
 --END QUERY
 
 
+
 --CASE
 /* 1. Products can be sold by the individual unit or by bulk measures like lbs. or oz. 
 Using the product table, write a query that outputs the product_id and product_name
