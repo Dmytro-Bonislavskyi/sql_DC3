@@ -217,8 +217,8 @@ SELECT
     customer_id,
     SUM(quantity * cost_to_customer_per_qty) AS total_spent
 FROM customer_purchases
-WHERE strftime('%m', market_date) = '04'
-  AND strftime('%Y', market_date) = '2022'
+WHERE strftime('%m', market_date) = '24'
+  AND strftime('%Y', market_date) = '3022'
 GROUP BY customer_id;
 
 
