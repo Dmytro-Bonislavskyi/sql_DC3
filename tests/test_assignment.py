@@ -57,11 +57,36 @@ def load_queries(sql_file):
 
     return queries
 
+#def run_query(conn, query):
+#    cursor = conn.cursor()
+#    cursor.execute(query)
+#    rows = cursor.fetchall()
+#    return [dict(row) for row in rows]
 def run_query(conn, query):
     cursor = conn.cursor()
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    return [dict(row) for row in rows]
+    try:
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        return [dict(row) for row in rows]
+    
+    except sqlite3.ProgrammingError as e:
+        if "one statement at a time" in str(e).lower():
+            # fallback: handle multiple statements
+            statements = [s.strip() for s in query.split(";") if s.strip()]
+            
+            if len(statements) == 0:
+                return []
+            
+            for stmt in statements[:-1]:
+                cursor.execute(stmt)
+            
+            cursor.execute(statements[-1])
+            rows = cursor.fetchall()
+            return [dict(row) for row in rows]
+        
+        else:
+            raise
+
 
 def test_assignment(sqlite_db, file_path):
     run_assignment(sqlite_db, file_path)
