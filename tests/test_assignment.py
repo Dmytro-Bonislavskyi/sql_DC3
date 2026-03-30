@@ -121,3 +121,4 @@ if __name__ == "__main__":
     conn = sqlite3.connect("05_src/sql/farmersmarket.db")
     conn.row_factory = sqlite3.Row
     run_assignment(conn, "02_activities/assignments/DC_Cohort/assignment1.sql")
+    
