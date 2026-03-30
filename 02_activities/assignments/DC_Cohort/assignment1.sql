@@ -17,7 +17,7 @@ SELECT * FROM "customer"
 sorted by customer_last_name, then customer_first_ name. */
 --QUERY 2
 SELECT * FROM 'customer'
-ORDER BY 'customer_last_name', customer_first_name
+ORDER BY 'customer_last_name', customer_first_ name
 LIMIT 10
 
 
@@ -162,6 +162,7 @@ When inserting the new vendor, you need to appropriately align the columns to be
 VALUES(col1,col2,col3,col4,col5) 
 */
 --QUERY 10
+
 
 --END QUERY
 
