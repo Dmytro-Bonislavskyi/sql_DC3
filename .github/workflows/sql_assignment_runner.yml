@@ -35,13 +35,16 @@ jobs:
         id: changes
         run: |
           git fetch
-          git diff --name-only origin/main > changed_files.txt
+          git diff --name-only origin/main  > changed_files.txt
       
           echo "Changed files:"
           cat changed_files.txt
-          
+          # The goal here to search for a file modified during PR that is match to a pattern
+          # and give priority in next order 2, 1 as it quite often happens when students submit
+          # PR without following assignments order and git flow. It will to run latest / greatest
           assignment_changed=""
           
+          # Priority: assignment2 > assignment1
           if grep -qE '(^|/)assignment2\.sql$' changed_files.txt; then
             assignment_changed=$(grep -E '(^|/)assignment2\.sql$' changed_files.txt | head -n1)
           elif grep -qE '(^|/)assignment1\.sql$' changed_files.txt; then
@@ -55,7 +58,7 @@ jobs:
       - name: Run tests
         id: pytest
         run: |
-          pytest tests/test_assignment.py --file_path="${{ steps.changes.outputs.assignment_changed }}" --tb=short --disable-warnings \
+          pytest tests/test_assignment.py --file_path="${{steps.changes.outputs.assignment_changed}}" --tb=short --disable-warnings \
                  --junitxml=pytest-report.xml || true
 
       - name: Post test results to PR
@@ -66,47 +69,50 @@ jobs:
               if (!Array.isArray(data) || data.length === 0) {
                 return 'No data';
               }
-
+              
               const headers = Object.keys(data[0]);
+              
+              // Header row
               const headerRow = `| ${headers.join(' | ')} |`;
+              
+              // Separator row
               const separatorRow = `| ${headers.map(() => '---').join(' | ')} |`;
+              
+              // Data rows
               const rows = data.map(row =>
                 `| ${headers.map(h => formatValue(row[h])).join(' | ')} |`
               );
-
+              
               return [headerRow, separatorRow, ...rows].join('\n');
-            }
-
+              }
+              
             function formatValue(value) {
               if (value === null || value === undefined) return '';
               if (typeof value === 'object') return `\`${JSON.stringify(value)}\``;
               return String(value);
             }
-
-            const fs = require('fs');
-            const file_read_result = fs.readFileSync('test-results.json', 'utf8');
-            const results = JSON.parse(file_read_result);
-
-            let body = `### 🧪 SQL Queries Run Results (up to 3 rows)\n\n`;
-            body += `<details><summary>Click to expand/collapse assignment queries execution results</summary>\n\n`;
-
+          
+            const fs = require('fs')
+            const file_read_result = fs.readFileSync('test-results.json', 'utf8')
+            const results = JSON.parse(file_read_result)
+            // Format PR comment
+            let body = `### 🧪 SQL Queries Run Results (up to 3 rows)\n\n`
+            body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>`
             for (const result of results) {
-              const hasArrayResults = Array.isArray(result.result) && result.result.length > 0;
-              const hasStringResults = typeof result.result === 'string' && result.result.trim().length > 0;
-
-              if (hasArrayResults || hasStringResults) {
-                body += `✅ Query ${result.number}: \n\n*${result.query}*\n\n**Results**:\n\n`;
-                const table = jsonToMarkdownTable(result.result);
-                body += `${table}\n\n`;
-                body += `--------------------------------------------------------\n`;
+                if (result.result && result.result.length > 0) {
+                  body += `✅ Query ${result.number}: \n\n *${result.query}*, \n\n **Results**:  \n`
+                  const table = jsonToMarkdownTable(result.result)
+                  body +=  `${table} \n`
+                  body += `\n`
+                  body += `-------------------------------------------------------- \n` 
               }
             }
-
-            body += `</details>`;
-
+            body += `</details>`
+            
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               body
-            });
+            })
+
