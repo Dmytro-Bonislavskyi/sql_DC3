@@ -72,12 +72,27 @@ def run_assignment(sqlite_db, file_path):
         test_result = []
         for parsed_query in queries:
             try:
-                rows = run_query(sqlite_db, parsed_query['query'])
-                test_result.append( { "number": parsed_query['number'], "query": parsed_query['query'], "result": rows[0:3] })
+                rows = run_query(sqlite_db, parsed_query["query"])
+                test_result.append({
+                    "number": parsed_query["number"],
+                    "query": parsed_query["query"],
+                    "result": rows[0:3],
+                    "error": None
+                })
             except Exception as e:
-                print(f"An unexpected error occurred: {e}")
+                test_result.append({
+                    "number": parsed_query["number"],
+                    "query": parsed_query["query"],
+                    "result": [],
+                    "error": str(e)
+                })
         json.dump(test_result, json_file, indent=2)
+
     # The purpose of it to have report in the future in case DSI will want to go with unit testing style.
-    # assert True,  "test execution query {} result {}".format(queries, test_result)
+    # assert True, "test execution query {} result {}".format(queries, test_result)
 
-
+if __name__ == "__main__":
+    print("running tests...")
+    conn = sqlite3.connect("05_src/sql/farmersmarket.db")
+    conn.row_factory = sqlite3.Row
+    run_assignment(conn, "02_activities/assignments/DC_Cohort/assignment1.sql")
