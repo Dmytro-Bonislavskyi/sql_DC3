@@ -1,0 +1,282 @@
+[
+  {
+    "number": 1,
+    "query": "SELECT * FROM \"customer\"",
+    "result": [
+      {
+        "customer_id": 1,
+        "customer_first_name": "Alejandro",
+        "customer_last_name": "Costa",
+        "customer_postal_code": "M8Y"
+      },
+      {
+        "customer_id": 2,
+        "customer_first_name": "Mei",
+        "customer_last_name": "Chen",
+        "customer_postal_code": "M1L"
+      },
+      {
+        "customer_id": 3,
+        "customer_first_name": "Amir",
+        "customer_last_name": "Khan",
+        "customer_postal_code": "M4H"
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 2,
+    "query": "SELECT * FROM 'customer'\nORDER BY 'customer_last_name', customer_first_name\nLIMIT 10",
+    "result": [
+      {
+        "customer_id": 13,
+        "customer_first_name": "Abigail",
+        "customer_last_name": "Harris",
+        "customer_postal_code": "M3H"
+      },
+      {
+        "customer_id": 1,
+        "customer_first_name": "Alejandro",
+        "customer_last_name": "Costa",
+        "customer_postal_code": "M8Y"
+      },
+      {
+        "customer_id": 3,
+        "customer_first_name": "Amir",
+        "customer_last_name": "Khan",
+        "customer_postal_code": "M4H"
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 3,
+    "query": "SELECT * FROM customer_purchases\nWHERE product_ID = 4 OR product_ID = 5\n/*WHERE product_id IN (4, 9)*/\nLIMIT 25",
+    "result": [
+      {
+        "product_id": 4,
+        "vendor_id": 7,
+        "market_date": "2022-04-05",
+        "customer_id": 3,
+        "quantity": 1,
+        "cost_to_customer_per_qty": 4,
+        "transaction_time": "18:44:00"
+      },
+      {
+        "product_id": 4,
+        "vendor_id": 7,
+        "market_date": "2022-04-05",
+        "customer_id": 4,
+        "quantity": 1,
+        "cost_to_customer_per_qty": 4,
+        "transaction_time": "18:09:00"
+      },
+      {
+        "product_id": 4,
+        "vendor_id": 7,
+        "market_date": "2022-04-05",
+        "customer_id": 5,
+        "quantity": 3,
+        "cost_to_customer_per_qty": 4,
+        "transaction_time": "18:54:00"
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 4,
+    "query": "SELECT *, quantity * cost_to_customer_per_qty AS price\nFROM customer_purchases\nWHERE customer_id >= 8 AND customer_id <= 10\n/*WHERE customer_id BETWEEN 8 AND 10*/\nLIMIT 25",
+    "result": [
+      {
+        "product_id": 1,
+        "vendor_id": 7,
+        "market_date": "2022-07-12",
+        "customer_id": 8,
+        "quantity": 2.71,
+        "cost_to_customer_per_qty": 6.99,
+        "transaction_time": "18:35:00",
+        "price": 18.9429
+      },
+      {
+        "product_id": 1,
+        "vendor_id": 7,
+        "market_date": "2022-07-15",
+        "customer_id": 10,
+        "quantity": 2.34,
+        "cost_to_customer_per_qty": 6.99,
+        "transaction_time": "10:21:00",
+        "price": 16.3566
+      },
+      {
+        "product_id": 1,
+        "vendor_id": 7,
+        "market_date": "2022-07-15",
+        "customer_id": 10,
+        "quantity": 2.28,
+        "cost_to_customer_per_qty": 6.99,
+        "transaction_time": "10:29:00",
+        "price": 15.937199999999999
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 5,
+    "query": "SELECT product_id, product_name,\n\tCASE\n\t\tWHEN product_qty_type = 'unit' THEN \"unit\"\n\t\tELSE 'bulk'\n\tEND AS prod_qty_type_condensed\n\nFROM product",
+    "result": [
+      {
+        "product_id": 1,
+        "product_name": "Habanero Peppers - Organic",
+        "prod_qty_type_condensed": "bulk"
+      },
+      {
+        "product_id": 2,
+        "product_name": "Jalapeno Peppers - Organic",
+        "prod_qty_type_condensed": "bulk"
+      },
+      {
+        "product_id": 3,
+        "product_name": "Poblano Peppers - Organic",
+        "prod_qty_type_condensed": "unit"
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 6,
+    "query": "SELECT \n    product_id,\n    product_name,\n    CASE \n        WHEN product_qty_type = 'unit' THEN 'unit'\n        ELSE 'bulk'\n    END AS prod_qty_type_condensed,\n    CASE\n        WHEN LOWER(product_name) LIKE '%pepper%' THEN 1\n        ELSE 0\n    END AS pepper_flag\nFROM product",
+    "result": [
+      {
+        "product_id": 1,
+        "product_name": "Habanero Peppers - Organic",
+        "prod_qty_type_condensed": "bulk",
+        "pepper_flag": 1
+      },
+      {
+        "product_id": 2,
+        "product_name": "Jalapeno Peppers - Organic",
+        "prod_qty_type_condensed": "bulk",
+        "pepper_flag": 1
+      },
+      {
+        "product_id": 3,
+        "product_name": "Poblano Peppers - Organic",
+        "prod_qty_type_condensed": "unit",
+        "pepper_flag": 1
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 7,
+    "query": "SELECT *\nFROM vendor v\nINNER JOIN vendor_booth_assignments vba \n\tON v.vendor_id = vba.vendor_id\nORDER BY market_date, vendor_name\nLIMIT 24",
+    "result": [
+      {
+        "vendor_id": 8,
+        "vendor_name": "Annie's Pies",
+        "vendor_type": "Prepared Foods",
+        "vendor_owner_first_name": "Annie",
+        "vendor_owner_last_name": "Aquinas",
+        "booth_number": 6,
+        "market_date": "2022-04-05"
+      },
+      {
+        "vendor_id": 1,
+        "vendor_name": "Chris's Sustainable Eggs & Meats",
+        "vendor_type": "Eggs & Meats",
+        "vendor_owner_first_name": "Chris",
+        "vendor_owner_last_name": "Sylvan",
+        "booth_number": 2,
+        "market_date": "2022-04-05"
+      },
+      {
+        "vendor_id": 4,
+        "vendor_name": "Fields of Corn",
+        "vendor_type": "Fresh Focused",
+        "vendor_owner_first_name": "Samuel",
+        "vendor_owner_last_name": "Smith",
+        "booth_number": 7,
+        "market_date": "2022-04-05"
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 8,
+    "query": "SELECT vendor_id,\tCOUNT(vendor_id) AS booth_ass\nFROM vendor_booth_assignments\nGROUP BY vendor_id",
+    "result": [
+      {
+        "vendor_id": 1,
+        "booth_ass": 142
+      },
+      {
+        "vendor_id": 3,
+        "booth_ass": 142
+      },
+      {
+        "vendor_id": 4,
+        "booth_ass": 211
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 9,
+    "query": "SELECT \n    c.customer_id,\n    c.customer_first_name,\n    c.customer_last_name,\n    SUM(p.quantity * p.cost_to_customer_per_qty) AS total_spent\nFROM customer c\nJOIN customer_purchases p\n    ON c.customer_id = p.customer_id\nGROUP BY c.customer_id, c.customer_first_name, c.customer_last_name\nHAVING SUM(p.quantity * p.cost_to_customer_per_qty) > 2000\nORDER BY c.customer_last_name, c.customer_first_name",
+    "result": [
+      {
+        "customer_id": 4,
+        "customer_first_name": "Leyla",
+        "customer_last_name": "Abadi",
+        "total_spent": 3561.6286
+      },
+      {
+        "customer_id": 7,
+        "customer_first_name": "Anwar",
+        "customer_last_name": "Ali",
+        "total_spent": 2921.1743
+      },
+      {
+        "customer_id": 12,
+        "customer_first_name": "Jalen",
+        "customer_last_name": "Carter",
+        "total_spent": 3290.0783
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 10,
+    "query": "/*\nCREATE TABLE temp.new_vendor AS\nSELECT *\nFROM vendor;\n\nINSERT INTO temp.new_vendor (\n    vendor_id,\n    vendor_name,\n    vendor_type,\n    vendor_owner_first_name,\n    vendor_owner_last_name\n)\nVALUES (\n    10,\n    'Thomass Superfood Store',\n    'Fresh Focused',\n    'Thomas',\n    'Rosenthal'\n);\n\n*/",
+    "result": [],
+    "error": null
+  },
+  {
+    "number": 11,
+    "query": "SELECT \n    customer_id,\n    strftime('%m', market_date) AS month,\n    strftime('%Y', market_date) AS year\nFROM customer_purchases\nLIMIT 25",
+    "result": [
+      {
+        "customer_id": 14,
+        "month": "07",
+        "year": "2022"
+      },
+      {
+        "customer_id": 14,
+        "month": "07",
+        "year": "2022"
+      },
+      {
+        "customer_id": 15,
+        "month": "07",
+        "year": "2022"
+      }
+    ],
+    "error": null
+  },
+  {
+    "number": 12,
+    "query": "SELECT \n    customer_id,\n    SUM(quantity * cost_to_customer_per_qty) AS total_spent\nFROM customer_purchases\nWHERE strftime('%m', market_date) = '24'\n  AND strftime('%Y', market_date) = '30221'\nGROUP BY customer_id",
+    "result": [],
+    "error": null
+  }
+]
