@@ -17,7 +17,7 @@ SELECT * FROM "customer"
 sorted by customer_last_name, then customer_first_ name. */
 --QUERY 2
 SELECT * FROM 'customer'
-ORDER BY 'customer_last_name', customer_first_ name
+ORDER BY 'customer_last_name', customer_first_name
 LIMIT 10
 
 
