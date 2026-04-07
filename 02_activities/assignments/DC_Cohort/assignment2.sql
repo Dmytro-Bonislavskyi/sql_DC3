@@ -80,6 +80,7 @@ WHERE product_size REGEXP '[0-9]';
 
 
 
+
 -- UNION
 --QUERY 7
 WITH sales_by_date AS (
