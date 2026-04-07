@@ -182,6 +182,25 @@ VALUES (
     'Rosenthal'
 );
 
+CREATE TABLE temp.new_vendor AS
+SELECT *
+FROM vendor;
+
+INSERT INTO temp.new_vendor (
+    vendor_id,
+    vendor_name,
+    vendor_type,
+    vendor_owner_first_name,
+    vendor_owner_last_name
+)
+VALUES (
+    10,
+    'Thomass Superfood Store',
+    'Fresh Focused',
+    'Thomas',
+    'Rosenthal'
+);
+
 --END QUERY
 
 
@@ -216,8 +235,8 @@ SELECT
     customer_id,
     SUM(quantity * cost_to_customer_per_qty) AS total_spent
 FROM customer_purchases
-WHERE strftime('%m', market_date) = '24'
-  AND strftime('%Y', market_date) = '30221'
+WHERE strftime('%m', market_date) = '04'
+  AND strftime('%Y', market_date) = '2022'
 GROUP BY customer_id;
 
 
