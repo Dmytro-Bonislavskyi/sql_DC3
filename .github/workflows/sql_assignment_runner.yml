@@ -1,16 +1,26 @@
 name: SQL Unit Tests
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
-
+  workflow_dispatch:  # Manual trigger from GitHub UI
+    inputs:
+      branch:
+        description: 'Branch to use to run assignment for, i.e. assignment-one, assignment-2'
+        required: true
+        default: assignment-one
+        type: string
+      pr_number:
+        description: 'Pull request number. Extract a number from the end of pull request url, i.e. https://github.com/khsergvl/sql/pull/17'
+        required: true
+        type: string
+        default: '1'
 permissions:
   contents: read
   pull-requests: write
 
 jobs:
   run-assignment-queries:
-    if: startsWith(github.head_ref, 'assignment-')
+    # uncomment once a change to PR trigger will be implemented
+    # if: startsWith(github.head_ref, 'assignment-')
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -20,7 +30,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref }}
+          ref: ${{ inputs.branch }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -35,7 +45,7 @@ jobs:
         id: changes
         run: |
           git fetch
-          git diff --name-only origin/main  > changed_files.txt
+          git diff --name-only origin/main > changed_files.txt
       
           echo "Changed files:"
           cat changed_files.txt
@@ -84,7 +94,7 @@ jobs:
               );
               
               return [headerRow, separatorRow, ...rows].join('\n');
-              }
+            }
               
             function formatValue(value) {
               if (value === null || value === undefined) return '';
@@ -95,22 +105,31 @@ jobs:
             const fs = require('fs')
             const file_read_result = fs.readFileSync('test-results.json', 'utf8')
             const results = JSON.parse(file_read_result)
-            // Format PR comment
+
             let body = `### 🧪 SQL Queries Run Results (up to 3 rows)\n\n`
-            body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>`
+            body += `<details> <summary>Click to expand/collapse assignment queries execution results</summary>\n\n`
+
             for (const result of results) {
+              const isArrayResult = Array.isArray(result.result);
+
+              if (result.error) {
+                body += `❌ Query ${result.number}: \n\n *${result.query}*, \n\n **Error**:  \n${result.error}\n\n`
+              } else if (isArrayResult && result.result.length === 0) {
+                body += `⚪ Query ${result.number}: \n\n *${result.query}*, \n\n No rows returned \n\n`
+              } else if (isArrayResult && result.result.length > 0) {
                 body += `✅ Query ${result.number}: \n\n *${result.query}*, \n\n **Results**:  \n`
                 const table = jsonToMarkdownTable(result.result)
-                body +=  `${table} \n`
-                body += `\n`
-                body += `-------------------------------------------------------- \n` 
+                body += `${table} \n\n`
+              }
+
+              body += `-------------------------------------------------------- \n`;
             }
+
             body += `</details>`
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: ${{ inputs.pr_number }},
               body
             })
-
