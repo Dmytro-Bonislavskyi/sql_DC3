@@ -7,6 +7,11 @@ def sqlite_db():
     source_db = Path("05_src/sql/farmersmarket.db")
     # Create in-memory DB
     conn = sqlite3.connect(":memory:")
+        # Add REGEXP support
+    def regexp(pattern, value):
+        return 1 if re.search(pattern, value or "") else 0
+
+    conn.create_function("REGEXP", 2, regexp)
 
     # Load schema.db into memory
     disk_db = sqlite3.connect(source_db)
