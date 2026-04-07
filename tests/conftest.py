@@ -9,7 +9,7 @@ def sqlite_db():
     conn = sqlite3.connect(":memory:")
         # Add REGEXP support
     def regexp(pattern, value):
-        return 1 if re.search(pattern, value or "") else 0
+        return 1 if re.search(pattern, str(value or "")) else 0
 
     conn.create_function("REGEXP", 2, regexp)
 
