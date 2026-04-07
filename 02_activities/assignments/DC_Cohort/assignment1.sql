@@ -56,6 +56,7 @@ LIMIT 25;
 --END QUERY
 
 
+
 --CASE
 /* 1. Products can be sold by the individual unit or by bulk measures like lbs. or oz. 
 Using the product table, write a query that outputs the product_id and product_name
@@ -181,6 +182,24 @@ VALUES (
     'Rosenthal'
 );
 
+CREATE TABLE temp.new_vendor AS
+SELECT *
+FROM vendor;
+
+INSERT INTO temp.new_vendor (
+    vendor_id,
+    vendor_name,
+    vendor_type,
+    vendor_owner_first_name,
+    vendor_owner_last_name
+)
+VALUES (
+    10,
+    'Thomass Superfood Store',
+    'Fresh Focused',
+    'Thomas',
+    'Rosenthal'
+);
 
 --END QUERY
 
